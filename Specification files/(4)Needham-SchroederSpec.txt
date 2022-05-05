@@ -1,0 +1,64 @@
+// Needham-Schroeder Public Key Formal Specification
+// ****************************************
+// Author: Shireen Kudukkil Manchingal
+// Date: 19 Feb 2017
+
+
+// Protocol specification
+// ------------------------
+// A,B,S : Principal
+// Na,Nb : Nonce
+// KPa,KPb,KPs,KSa,KSb,KSs : Key
+// KPa,KSa : is a key pair
+// KPb,KSb : is a key pair
+// KPs,KSs : is a key pair
+
+// 1. A -> S : A,B
+// 2. S	-> A : {KPb, B}KSs
+// 3. A	-> B : {Na, A}KPb
+// 4. B	-> S : B,A
+// 5. S	-> B : {KPa, A}KSs
+// 6. B	-> A : {Na, Nb}KPa
+// 7. A	-> B : {Nb}KPb
+
+
+// 1.Initial Assupmtions
+// -----------------------
+// a.Express A's possessions/knowledge at time t0
+A1: A possess at[0] KaPriv;
+A2: A possess at[0] Na;
+A3: A possess at[0] KttpPub;
+A4: A know at[0] B possess at[0] KaPub;
+A5: A know at[0] NOT(Zero possess at[0] Na);
+
+// b.Express B's possessions/knowledge at time t0
+A6: B possess at[0] KbPriv;
+A7: B possess at[0] Nb;
+A8: B possess at[0] KttpPub;
+A9: B know at[0] A possess at[0] KbPub;
+A10: B know at[0] NOT(Zero possess at[0] Nb);
+
+
+// ***************************************************************
+// Protocol Steps
+// ---------------
+S1: TTP receivefrom A at[1] A,S;
+S2: A receivefrom TTP at[2] {KbPub,B}KttpPriv;
+S3: B receivefrom A at[3] {Na,A}KbPub;
+S4: TTP receivefrom B at[4] B,A;
+S5: B receivefrom TTP at[5] {KaPub,A}KttpPriv;
+S6: A receivefrom B at[6] {Na,Nb}KaPub;
+S7: B receivefrom A at[7] {Nb}KbPub;
+
+
+// ***************************************************************
+// Protocol Goals
+// ---------------
+G1: A know at[6] B send at[6] {Na,Nb}KaPub;
+G2: B know at[7] A send at[7] {Nb}KbPub;
+G3: A possess at[3] KbPub;
+G4: B possess at[6] KaPub;
+G5: A know at[7] not(Zero send at[0] {Na,Nb}KaPub);
+G6: A know at[7] B send at [7] {Na,Nb}KaPub;
+G7: B know at[4] not(Zero send at[4] {Na,A}KbPub);
+G8: A know at[4] B send at [4] {Na,A}KbPub;

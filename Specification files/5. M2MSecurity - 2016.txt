@@ -1,0 +1,114 @@
+//----------------------------------------------------------------------------------------------------------------
+//
+//   Security in M2M communication
+//   ******************************
+//  “ Designing and verifying a P2P service security protocol
+//    in M2M environment “, 2016
+// 
+//----------------------------------------------------------------------------------------------------------------
+//   Author: Shireen Kudukkil Manchingal
+//   Date: 16 July 2017
+
+
+
+// PROTOCOL SPECIFICATION
+// ***********************
+// Alice, Bob : Communicating entities
+// DBServer : DatabaseServer
+// KdbPub : PublicKey
+// KdbPriv : SecretKey
+// Ka, Kb : SessionKey
+// TSa, TSb : TimeStamp
+
+
+// 1. Alice -> Bob : H(BobID), TSa, {BobID, Secret(Alice), Ka}KdbPub
+// 2. Bob -> DBServer : H(BobID), TSb, {AliceID, Secret(Bob), Kb}KdbPub, {BobID, Secret(Alice), Ka}KdbPub
+// 3. DBServer -> Bob : H(idDB,BobID), Ka(+)Kb
+// 4. Bob -> Alice : {BobID}{Ka}(+)BobID, H(idDB)
+// 5. Alice -> Bob : H(Ka, AliceID), TSa
+
+
+
+//-----------------------------------------------------------------------------------------------------------------
+
+
+// 1.Initial Assumptions
+// **********************
+// a.Express A's possessions/knowledge at time t0
+A1: A possess at[0] Ka;
+A2: A possess at[0] KdbPub;
+A3: A possess at[0] secretA;
+A4: A possess at[0] TSa;
+A5: A possess at[0] idA;
+A6: A know at[0] NOT(Zero possess at[0] secretA);
+A7: A know at[0] NOT(Zero possess at[0] Ka);
+A8: A know at[0] NOT(Zero possess at[0] TSa);
+A9: A know at[0] NOT(Zero possess at[0] idA);
+
+// b.Express B's possessions/knowledge at time t0
+A10: B possess at[0] Kb;
+A11: B possess at[0] KdbPub;
+A12: B possess at[0] secretB;
+A13: B possess at[0] TSb;
+A14: B possess at[0] idB;
+A15: B know at[0] DB possess at[0] KdbPriv;
+A16: B know at[0] NOT(Zero possess at[0] secretB);
+A17: B know at[0] NOT(Zero possess at[0] Kb);
+A18: B know at[0] NOT(Zero possess at[0] TSb);
+A19: B know at[0] NOT(Zero possess at[0] idA);
+A20: B know at[0] NOT(Zero possess at[0] idB);
+
+// c.Express DB's possessions/knowledge at time t0
+A21: DB possess at[0] KdbPub;
+A22: DB possess at[0] KdbPriv;
+A23: DB possess at[0] idDB;
+A24: DB know at[0] A possess at[0] secretA;
+A25: DB know at[0] B possess at[0] secretB;
+A26: DB know at[0] NOT(Zero possess at[0] KdbPriv);
+A27: DB know at[0] NOT(Zero possess at[0] idDB);
+A28: DB know at[0] NOT(Zero possess at[0] secretA);
+A29: DB know at[0] NOT(Zero possess at[0] secretB);
+A30: (((DB know at[0] A possess at[0] secretA) AND (DB know at[0] NOT(Zero possess at[0] secretA))) IMPLY (DB know at[2] A send at[2] {idB, secretA, Ka}KdbPub));
+A31: (((DB know at[0] B possess at[0] secretB) AND (DB know at[0] NOT(Zero possess at[0] secretB))) IMPLY (DB know at[2] B send at[2] {idA, secretB, Kb}KdbPub));
+
+
+
+
+// 2.Protocol Steps
+// *****************
+S1: B receivefrom A at[1] H(idB), TSa, {idB, secretA, Ka}KdbPub;
+S2: DB receivefrom B at[2] H(idB), TSb, {idA, secretB, Kb}KdbPub, {idB, secretA, Ka}KdbPub;
+S3: B receivefrom DB at[3] H(idDB,idB), {Ka, Kb}KdbPriv;
+S4: A receivefrom B at[4] {idB}Ka, idB, H(idDB);
+S5: B receivefrom A at[5] H(Ka, idA), TSa;
+
+
+
+
+// 3.Protocol Goals
+// *****************
+G1: B possess at[1] H(idB);
+G2: B possess at[1] TSa;
+G3: B possess at[1] {idB, secretA, Ka}KdbPub;
+G4: B know at[1] not(Zero possess at[0] H(idB), TSa, {idB, secretA, Ka}KdbPub);
+G5: DB possess at[2] H(idB);
+G6: DB possess at[2] TSb;
+G7: DB possess at[2] Kb;
+G8: DB possess at[2] Ka;
+G9: DB possess at[2] secretA;
+G10: DB possess at[2] secretB;
+G11: DB know at[2] A send at[2] {idB, secretA, Ka}KdbPub;
+G12: DB know at[2] B send at[2] {idA, secretB, Kb}KdbPub;
+G13: B possess at[3] H(idDB, idB);
+G14: B possess at[3] {Ka, Kb}KdbPriv;
+G15: B possess at[3] Ka;
+G16: B know at[3] DB send at[3] {Ka, Kb}KdbPriv;
+G17: B know at[3] NOT(Zero possess at[0] {Ka, Kb}KdbPriv);
+G18: A possess at[4] H(idDB);
+G19: A possess at[4] {idB}Ka;
+G20: A possess at[4] idB;
+G21: A know at[4] NOT(Zero possess at[0] {idB}Ka, idB, H(idDB));
+G22: B possess at[5] H(Ka, idA);
+G23: B possess at[5] TSa;
+G24: B know at[5] NOT(Zero possess at[0] H(Ka, idA), TSa);
+

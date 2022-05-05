@@ -1,0 +1,139 @@
+//----------------------------------------------------------------------------------------------------------------
+//
+//   Tsai et al's THMEP protocol - Modified
+//   ***************************************
+//  “ TTP Based High-Efficient Multi-Key Exchange Protocol (THMEP) “, 2016
+//
+//----------------------------------------------------------------------------------------------------------------
+//   Author: Shireen Kudukkil Manchingal
+//   Date: 19 July 2017
+
+
+
+// PROTOCOL SPECIFICATION
+// ***********************
+// S : Trusted third party
+// TSs : Timestamp of S
+// Nsa, Nsb : Nonces of S to A and B 
+// idS,  idA, idB : Identities of S, A and B
+// Na, Nb : Nonces of A and B
+
+
+// Round 1
+// 1. S -> A : {idS, TSs , s’A, SA}
+//	S : SA = {Nsa}KaPub
+//	    s'A = F(H(Nsa),Kpwa)
+// 2. S -> B : {idS, TSs , s’B, SB}
+//	S : SB = {Nsb}KbPub
+//	    s'B = F(H(Nsb),Kpwb)
+// Round 2
+// 3. A -> S : {idA; x’A; XA}
+//	A : XA = {Na}KsPub
+//	    x'A = F(H(Na),Kpwa)
+// 4. B -> S : {idB; x’B; XB}
+//	B : XB = {Nb}KsPub
+//	    x'B = F(H(Nb),Kpwb)
+// Round 3
+// 5. S -> A : {idS, idB, XB, SB, nA}
+// 	nA = H(idA; idS ; idB; Na; Nsa; XB; SB; Kpwa)
+// 6. S -> B : {idS, idA, XA, SA, nB}
+// 	nB = H(idB; idS ; idA; Nb; Nsb; XA; SA; Kpwb)
+// 	A and B generate SK.
+
+
+
+//-----------------------------------------------------------------------------------------------------------------
+
+
+// 1.Initial Assumptions
+// **********************
+// a.Express A's possessions/knowledge at time t0
+A1: A possess at[0] KaPub;
+A2: A possess at[0] KaPriv;
+A3: A possess at[0] Na;
+A4: A possess at[0] idA;
+A5: A possess at[0] KttpPub;
+A6: A possess at[0] KbPub;
+A7: A know at[0] TTP possess at[0] KttpPriv;
+A8: A know at[0] B possess at[0] KbPriv;
+A9: A know at[0] NOT(Zero possess at[0] KaPriv);
+A10: A know at[0] NOT(Zero possess at[0] Na);
+A11: A know at[0] NOT(Zero possess at[0] idA);
+A12: A know at[0] NOT(Zero possess at[0] idS);
+
+
+// b.Express B's possessions/knowledge at time t0
+A13: B possess at[0] KbPub;
+A14: B possess at[0] KbPriv;
+A15: B possess at[0] Nb;
+A16: B possess at[0] idB;
+A17: B possess at[0] KttpPub;
+A18: B possess at[0] KaPub;
+A19: B know at[0] TTP possess at[0] KttpPriv;
+A20: B know at[0] A possess at[0] KaPriv;
+A21: B know at[0] NOT(Zero possess at[0] KbPriv);
+A22: B know at[0] NOT(Zero possess at[0] Nb);
+A23: B know at[0] NOT(Zero possess at[0] idB);
+A24: B know at[0] NOT(Zero possess at[0] idS);
+
+
+// c.Express TTP's possessions/knowledge at time t0
+A25: TTP possess at[0] KttpPub;
+A26: TTP possess at[0] KttpPriv;
+A27: TTP possess at[0] Nsa;
+A28: TTP possess at[0] Nsb;
+A29: TTP possess at[0] idS;
+A30: TTP possess at[0] TSs;
+A31: TTP possess at[0] Kpwa;
+A32: TTP possess at[0] Kpwb;
+A33: TTP possess at[0] KaPub;
+A34: TTP possess at[0] KbPub;
+A35: TTP know at[0] A possess at[0] KaPriv;
+A36: TTP know at[0] B possess at[0] KbPriv;
+A37: TTP know at[0] NOT(Zero possess at[0] KttpPriv);
+A38: TTP know at[0] NOT(Zero possess at[0] idS);
+
+
+
+
+// 2.Protocol Steps
+// *****************
+S1: A receivefrom TTP at[1] {idS, TSs, F(H(Nsa), Kpwa), {Nsa}KaPub}KttpPriv;
+S2: B receivefrom TTP at[2] {idS, TSs, F(H(Nsb), Kpwb), {Nsb}KbPub}KttpPriv;
+S3: TTP receivefrom A at[3] {idA, F(H(Na), Kpwa), {Na}KttpPub}KaPriv;
+S4: TTP receivefrom B at[4] {idB, F(H(Nb), Kpwb), {Nb}KttpPub}KbPriv;
+S5: A receivefrom TTP at[5] {idS, idB, {Nb}KttpPub, {Nsb}KbPub, H(idA, idS, idB, Na, Nsa, {Nb}KttpPub, {Nsb}KbPub, Kpwa)}KttpPriv;
+S6: B receivefrom TTP at[6] {idS, idA, {Na}KttpPub, {Nsa}KaPub, H(idB, idS, idA, Nb, Nsb, {Na}KttpPub, {Nsa}KaPub, Kpwb)}KttpPriv;
+
+
+
+
+// 3.Protocol Goals
+// *****************
+G1: A possess at[1] F(H(Nsa), Kpwa);
+G2: A possess at[1] Nsa;
+G3: A possess at[1] idS;
+G4: A know at[1] TTP send at[1] {idS, TSs, F(H(Nsa), Kpwa), {Nsa}KaPub}KttpPriv;
+G5: B possess at[2] F(H(Nsb), Kpwb);
+G6: B possess at[2] Nsb;
+G7: B possess at[2] idS;
+G8: B know at[2] TTP send at[2] {idS, TSs, F(H(Nsb), Kpwb), {Nsb}KbPub}KttpPriv;
+G9: TTP possess at[3] F(H(Na), Kpwa);
+G10: TTP possess at[3] Na;
+G11: TTP possess at[3] idA;
+G12: TTP know at[3] A send at[3] {idA, F(H(Na), Kpwa), {Na}KttpPub}KaPriv;
+G13: TTP possess at[4] F(H(Nb), Kpwb);
+G14: TTP possess at[4] Nb;
+G15: TTP possess at[4] idB;
+G16: TTP know at[4] B send at[4] {idB, F(H(Nb), Kpwb), {Nb}KttpPub}KbPriv;
+G17: A possess at[5] idB;
+G18: A possess at[5] H(idA, idS, idB, Na, Nsa, {Nb}KttpPub, {Nsb}KbPub, Kpwa);
+G19: A know at[5] TTP send at[5] {idS, idB, {Nb}KttpPub, {Nsb}KbPub, H(idA, idS, idB, Na, Nsa, {Nb}KttpPub, {Nsb}KbPub, Kpwa)}KttpPriv;
+G20: B possess at[6] idA;
+G21: B possess at[6] H(idB, idS, idA, Nb, Nsb, {Na}KttpPub, {Nsa}KaPub, Kpwb);
+G22: B know at[6] TTP send at[6] {idS, idA, {Na}KttpPub, {Nsa}KaPub, H(idB, idS, idA, Nb, Nsb, {Na}KttpPub, {Nsa}KaPub, Kpwb)}KttpPriv;
+
+
+
+
+

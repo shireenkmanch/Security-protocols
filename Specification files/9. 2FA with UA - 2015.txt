@@ -1,0 +1,108 @@
+ //----------------------------------------------------------------------------------------------------------------
+//
+//   Two-factor authentication with User Anonymity
+//   ***********************************************
+//  “ Preserving privacy for free: Efficient and provably secure
+//    two-factor authentication scheme with user anonymity “, 2015
+//
+//----------------------------------------------------------------------------------------------------------------
+//   Author: Shireen Kudukkil Manchingal
+//   Date: 22 July 2017
+
+
+
+// PROTOCOL SPECIFICATION
+// ***********************
+// A : A legitimate user 
+// S : Remote server
+// idA : Identity of user A
+// idS : Identity of server S
+// pwA : Password of user A
+// Na, Ns, Ns1 : Nonces
+// KsPub, KsPriv : Public and private keys of S
+
+
+// 1. A -> S : idA, H(Na,pwA)
+//	S : Va = H(H(pwA, Na), Ns)
+//	    fa = H(KsPriv, Ns, idA)
+//	    Wa = fa, H(Na, pwA)
+// 2. S -> A : Wa, Ns, KsPub
+// 3. A -> S : {F(idA), fa}KsPub
+// 4. S -> A : Ns1, H(H(Ns1, Va), Va)
+// 5. A -> S : H(idA, idS, H(Ns1, Va))
+
+
+
+//-----------------------------------------------------------------------------------------------------------------
+
+
+// 1.Initial Assumptions
+// **********************
+// a.Express A's possessions/knowledge at time t0
+A1: A possess at[0] idA;
+A2: A possess at[0] pwA;
+A3: A possess at[0] Na;
+A4: A possess at[0] KsPub;
+A5: A know at[0] S possess at[0] KsPriv;
+A6: A know at[0] NOT(Zero possess at[0] idA);
+A7: A know at[0] NOT(Zero possess at[0] pwA);
+A8: A know at[0] NOT(Zero possess at[0] Na);
+
+
+// b.Express S's possessions/knowledge at time t0
+A9: S possess at[0] idS;
+A10: S possess at[0] Ns;
+A11: S possess at[0] Ns1;
+A12: S possess at[0] KsPub;
+A13: S possess at[0] KsPriv;
+A14: S know at[0] A possess at[0] KsPub;
+A15: S know at[0] NOT(Zero possess at[0] idS);
+A16: S know at[0] NOT(Zero possess at[0] Ns);
+A17: S know at[0] NOT(Zero possess at[0] Ns1);
+A18: S know at[0] NOT(Zero possess at[0] KsPriv);
+A19: S know at[0] A possess at[0] idA;
+A20: S know at[1] ((A possess at[0] idA AND S receivefrom A at[1] {idA, H(Na, pwA)}KsPub) IMPLY (A send at[1] {idA, H(Na, pwA)}KsPub));
+A21: S know at[3] ((A possess at[0] idA AND S receivefrom A at[3] {F(idA), H(KsPriv, Ns, idA)}KsPub) IMPLY (A send at[3] {F(idA), H(KsPriv, Ns, idA)}KsPub));
+A22: S know at[5] ((A possess at[0] idA AND S receivefrom A at[5] {H(idA, idS, H(Ns1, H(H(pwA, Na), Ns)))}KsPub) IMPLY (A send at[5] {H(idA, idS, H(Ns1, H(H(pwA, Na), Ns)))}KsPub));
+
+
+
+
+// 2.Protocol Steps
+// *****************
+S1: S receivefrom A at[1] {idA, H(Na, pwA)}KsPub;
+S2: A receivefrom S at[2] {H(KsPriv, Ns, idA), H(Na, pwA), Ns, KsPub}KsPriv;
+S3: S receivefrom A at[3] {F(idA), H(KsPriv, Ns, idA)}KsPub;
+S4: A receivefrom S at[4] {Ns1, H(H(Ns1, H(H(pwA, Na), Ns)), H(H(pwA, Na), Ns))}KsPriv;
+S5: S receivefrom A at[5] {H(idA, idS, H(Ns1, H(H(pwA, Na), Ns)))}KsPub;
+
+
+
+
+// 3.Protocol Goals
+// *****************
+G1: S possess at[1] idA;
+G2: S possess at[1] H(Na, pwA);
+G3: S know at[1] A send at[1] {idA, H(Na, pwA)}KsPub;
+G4: A possess at[2] H(KsPriv, Ns, idA);
+G5: A possess at[2] H(Na, pwA);
+G6: A possess at[2] Ns;
+G7: A possess at[2] KsPub;
+G8: A know at[2] S send at[2] {H(KsPriv, Ns, idA), H(Na, pwA), Ns, KsPub}KsPriv;
+G9: A know at[2] NOT(Zero send at[2] {H(KsPriv, Ns, idA), H(Na, pwA), Ns, KsPub}KsPriv);
+G10: S possess at[3] F(idA);
+G11: S possess at[3] H(KsPriv, Ns, idA);
+G12: S know at[3] A send at[3] {F(idA), H(KsPriv, Ns, idA)}KsPub;
+G13: A possess at[4] Ns1;
+G14: A possess at[4] H(H(Ns1, H(H(pwA, Na), Ns)), H(H(pwA, Na), Ns));
+G15: A know at[4] S send at[4] {Ns1, H(H(Ns1, H(H(pwA, Na), Ns)), H(H(pwA, Na), Ns))}KsPriv;
+G16: A know at[4] NOT(Zero send at[4] {Ns1, H(H(Ns1, H(H(pwA, Na), Ns)), H(H(pwA, Na), Ns))}KsPriv);
+G17: S possess at[5] H(idA, idS, H(Ns1, H(H(pwA, Na), Ns)));
+G18: S know at[5] A send at[5] {H(idA, idS, H(Ns1, H(H(pwA, Na), Ns)))}KsPub;
+
+
+
+
+
+
+

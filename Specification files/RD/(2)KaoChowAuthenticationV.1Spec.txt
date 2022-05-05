@@ -1,0 +1,77 @@
+// Kao Chow Authentication v.1 Formal Specification
+// **************************************************
+// Author: Shireen Kudukkil Manchingal
+// Date: 11 Feb 2017
+
+
+// Protocol specification
+// ------------------------
+// A, B, TTP :  principal
+// Na, Nb :  number
+// Kab, Kbs, Kas :  key
+
+// 1. A	-> TTP :  A, B, Na
+// 2. TTP -> B :  {A, B, Na, Kab}Kas, {A, B, Na, Kab}Kbs
+// 3. B	-> A :  {A, B, Na, Kab}Kas, {Na}Kab, Nb
+// 4. A	-> B :  {Nb}Kab
+
+
+// 1.Initial Assupmtions
+// -----------------------
+// a.Express A's possessions/knowledge at time t0
+A1: A possess at[0] Kas;
+A2: A know at[0] TTP possess at[0] Kas;
+A3: A possess at[0] Na;
+A4: A know at[0] NOT(Zero possess at[0] Na);
+A5: B possess at[0] Kbs;
+A6:     B know at[0] TTP possess at[0] Kbs;
+A7:     B possess at[0] Nb;
+A8:     B know at[0] NOT(Zero possess at[0] Nb);
+A9:     TTP possess at[0] Kas;
+A10:   TTP possess at[0] Kbs;
+A11:   TTP possess at[0] Kab;
+A12:   TTP know at[0] NOT(Zero possess at[0] Kab);
+A13:   A know at[3] ( ((A receivefrom B at[3] {Na}Kab AND A know at[0] NOT(Zero possess at[0] {Na}Kab)) AND (A know at[3] TTP send at[3] {A,B,Na,Kab}Kas AND A know at[3] NOT(Zero send at[0] {A,B,Na,Kab}Kas))) IMPLY (B possess at[3] Kab) );
+A14:   B know at[4] ( ((B receivefrom A at[4] {Nb}Kab AND B know at[0] NOT(Zero possess at[0] {Nb}Kab)) AND (B know at[2] TTP send at[2] {A,B,Na,Kab}Kbs AND B know at[2] NOT(Zero send at[0] {A,B,Na,Kab}Kbs))) IMPLY (A possess at[4] Kab) );
+
+//A1: A possess at[0] Kas;
+//A2: A possess at[0] Na;
+//A3: A know at[0] TTP possess at[0] Kas;
+//A4: A know at[0] NOT(Zero possess at[0] Na);
+
+// b.Express B's possessions/knowledge at time t0
+//A5: B possess at[0] Kbs;
+//A6: B possess at[0] Nb;
+//A7: B know at[0] TTP possess at[0] Kbs;
+//A8: B know at[0] NOT(Zero possess at[0] Nb);
+
+// c.Express TTP's possessions/knowledge at time t0
+//A9: TTP possess at[0] Kab;
+//A10: TTP know at[0] NOT(Zero possess at[0] Kab);
+
+//A13: A know at[3] ( ((A receivefrom B at[3] {Na}Kab AND A know at [0] NOT(Zero possess at[0] {Na}Kab)) AND A know at[3] TTP send at[3] {A,B,Na,Kab}Kas) IMPLY (B possess at[3] Kab) );
+
+//A14: B know at[4] ( ((B receivefrom A at[4] {Nb}Kab AND B know at[0] NOT(Zero possess at[0] {Nb}Kab)) AND B know at[2] TTP send at[2] {A,B,Na,Kab}Kbs) IMPLY (A possess at[4] Kab) );
+
+// ***************************************************************
+// Protocol Steps
+// ---------------
+S1: TTP receivefrom A at[1] A,B,Na;
+S2: B receivefrom TTP at[2] {A,B,Na,Kab}Kas,{A,B,Na,Kab}Kbs;
+S3: A receivefrom B at[3] {A,B,Na,Kab}Kas,{Na}Kab,Nb;
+S4: B receivefrom A at[4] {Nb}Kab;
+
+
+// ***************************************************************
+// Protocol Goals
+// ---------------
+G1: B possess at[2] Kab; 
+G2: B know at[2] TTP send at[2] {A,B,Na,Kab}Kbs; 
+G3: B know at[2] NOT(Zero send at[0] {A,B,Na,Kab}Kbs); 
+G4: A possess at[3] Kab; 
+G5: A know at[3] TTP send at[3] {A,B,Na,Kab}Kas; 
+G6: A know at[3] NOT(Zero send at[0] {A,B,Na,Kab}Kas); 
+G7: A know at[3] B send at[3] {Na}Kab; 
+G8: A know at[3] NOT(Zero send at[0] {Na}Kab); 
+G9: B know at[4] A send at[4] {Nb}Kab; 
+G10: B know at[4] NOT(Zero send at[0] {Nb}Kab);

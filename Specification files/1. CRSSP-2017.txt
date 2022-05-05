@@ -1,0 +1,116 @@
+//----------------------------------------------------------------------------------------------------------------
+//
+//   Classiquantum Resistance Secure Simple Pairing (CRSSP)
+//   ***********************************************************
+//  “ Design and analysis of pairing protocol for bluetooth enabled 
+//     devices using R-LWE Lattice-based cryptography “, 2017
+// 
+//----------------------------------------------------------------------------------------------------------------
+//   Author: Shireen Kudukkil Manchingal
+//   Date: 03 July 2017
+
+
+
+// PROTOCOL SPECIFICATION
+// ***********************
+// KaPub1, KaPub2 : RLWE Public keys of A
+// KaPriv1, KaPriv2 : RLWE Private keys of A
+// KbPub1, KbPub2 : RLWE Public keys of B
+// KbPriv1, KbPriv2 : RLWE Private keys of B
+// ioCapA, ioCapB : IO capabilities of A and B
+// bdAddressA, bdAddressB : Bluetooth Device Addresses
+// Na, Nb : Nonces
+
+
+// 1. A -> B : ioCapA, bdAddressA, KaPub1
+//	B : SecretKeyB1 = F(KbPriv1, KbPub1, KaPub1)
+// 2. B -> A : ioCapB, bdAddressB, KbPub1
+//	A : SecretKeyA1 = F(KaPriv1, KaPub1, KbPub1)
+// 3. A -> B : Na
+//	B : SignatureB = H(SecretKeyB1, Nb, Na, KbPub1, KaPub1)
+// 4. B -> A : Nb
+//	A : SignatureA = H(SecretKeyA1, Na, Nb, KaPub1, KbPub1)
+// 5. A -> B : SignatureA
+// 6. B -> A : SignatureB
+// 7. A -> B : KaPub2
+//	B : SecretKeyB2 = F(KbPriv2, KbPub2, KaPub2)
+//	    SessionKeyB = H(SecretKeyB1, SecretKeyB2, ioCapB, bdAddressB, KbPub2, KaPub2)
+// 8. B -> A : KbPub2
+//	A : SecretKeyA2 = F(KaPriv2, KaPub2, KbPub2)
+//	    SessionKeyA = H(SecretKeyA1, SecretKeyA2, ioCapA, bdAddressA, KaPub2, KbPub2)
+// 9. A -> B : {dataA}SessionKeyA
+// 10. B -> A : {databB}SessionKeyB
+
+
+
+//-----------------------------------------------------------------------------------------------------------------
+
+
+// 1.Initial Assumptions
+// **********************
+// a.Express A's possessions/knowledge at time t0
+A1: A possess at[0] KaPub1;
+A2: A possess at[0] KaPriv1;
+A3: A possess at[0] KaPub2;
+A4: A possess at[0] KaPriv2;
+A5: A possess at[0] dataA;
+A6: A possess at[0] bdAddressA;
+A7: A possess at[0] ioCapA;
+A8: A possess at[0] Na;
+A9: A know at[0] NOT(Zero possess at[0] Na);
+A10: A know at[0] B possess at[0] KbPriv1;
+A11: A know at[0] B possess at[0] KbPriv2;
+A12: A know at[0] NOT(Zero possess at[0] dataB);
+
+
+// b.Express B's possessions/knowledge at time t0
+A13: B possess at[0] KbPub1;
+A14: B possess at[0] KbPriv1;
+A15: B possess at[0] KbPub2;
+A16: B possess at[0] KbPriv2;
+A17: B possess at[0] dataB;
+A18: B possess at[0] bdAddressB;
+A19: B possess at[0] ioCapB;
+A20: B possess at[0] Nb;
+A21: B know at[0] NOT(Zero possess at[0] Nb);
+A22: B know at[0] A possess at[0] KaPriv1;
+A23: B know at[0] A possess at[0] KaPriv2;
+A24: B know at[0] NOT(Zero possess at[0] dataA);
+
+
+//c. Other assumptions
+A25: B know at[7] (((B receivefrom A at[7] {dataA}H(F(KaPriv1, KaPub1, KbPub1), F(KaPriv2, KaPub2, KbPub2), ioCapA, bdAddressA, KaPub2, KbPub2) AND B know at[0] A possess at[0] KaPriv1) AND B know at[0] A possess at[0] KaPriv2) IMPLY (A send at[7] {dataA}H(F(KaPriv1, KaPub1, KbPub1), F(KaPriv2, KaPub2, KbPub2), ioCapA, bdAddressA, KaPub2, KbPub2)));
+A26: A know at[8] (((A receivefrom B at[8] {dataB}H(F(KbPriv1, KbPub1, KaPub1), F(KbPriv2, KbPub2, KaPub2), ioCapB, bdAddressB, KbPub2, KaPub2) AND A know at[0] B possess at[0] KbPriv1) AND A know at[0] B possess at[0] KbPriv2) IMPLY (B send at[8] {dataB}H(F(KbPriv1, KbPub1, KaPub1), F(KbPriv2, KbPub2, KaPub2), ioCapB, bdAddressB, KbPub2, KaPub2)));
+
+
+
+// 2.Protocol Steps
+// *****************
+S1: B receivefrom A at[1] ioCapA, bdAddressA, KaPub1, Na;
+S2: A receivefrom B at[2] ioCapB, bdAddressB, KbPub1, Nb;
+S3: B receivefrom A at[3] H(F(KaPriv1, KaPub1, KbPub1), Na, Nb, KaPub1, KbPub1);
+S4: A receivefrom B at[4] H(F(KbPriv1, KbPub1, KaPub1), Nb, Na, KbPub1, KaPub1);
+S5: B receivefrom A at[5] KaPub2;
+S6: A receivefrom B at[6] KbPub2;
+S7: B receivefrom A at[7] {dataA}H(F(KaPriv1, KaPub1, KbPub1), F(KaPriv2, KaPub2, KbPub2), ioCapA, bdAddressA, KaPub2, KbPub2);
+S8: A receivefrom B at[8] {dataB}H(F(KbPriv1, KbPub1, KaPub1), F(KbPriv2, KbPub2, KaPub2), ioCapB, bdAddressB, KbPub2, KaPub2);
+
+
+
+
+// 3.Protocol Goals
+// *****************
+G1: B possess at[1] KaPub1;
+G2: A possess at[2] KbPub1;
+G3: B possess at[3] H(F(KaPriv1, KaPub1, KbPub1), Na, Nb, KaPub1, KbPub1);
+G4: B know at[3] (not(Zero possess at[0] H(F(KaPriv1, KaPub1, KbPub1), Na, Nb, KaPub1, KbPub1)));
+G5: A possess at[4] H(F(KbPriv1, KbPub1, KaPub1), Nb, Na, KbPub1, KaPub1);
+G6: A know at[4] (not(Zero possess at[0] H(F(KbPriv1, KbPub1, KaPub1), Nb, Na, KbPub1, KaPub1)));
+G7: B possess at[5] KaPub2;
+G8: A possess at[6] KbPub2;
+G9: A possess at[7] {dataA}H(F(KaPriv1, KaPub1, KbPub1), F(KaPriv2, KaPub2, KbPub2), bdAddressA, KaPub2, KbPub2);
+G10: B know at[7] not(Zero possess at[0] {dataA}H(F(KaPriv1, KaPub1, KbPub1), F(KaPriv2, KaPub2, KbPub2), ioCapA, bdAddressA, KaPub2, KbPub2));
+G11: B know at[7] A send at[7] {dataA}H(F(KaPriv1, KaPub1, KbPub1), F(KaPriv2, KaPub2, KbPub2), ioCapA, bdAddressA, KaPub2, KbPub2);
+G12: B possess at[8] {dataB}H(F(KbPriv1, KbPub1, KaPub1), F(KbPriv2, KbPub2, KaPub2), ioCapB, bdAddressB, KbPub2, KaPub2);
+G13: A know at[8] not(Zero possess at[0] {dataB}H(F(KbPriv1, KbPub1, KaPub1), F(KbPriv2, KbPub2, KaPub2), ioCapB, bdAddressB, KbPub2, KaPub2));
+G14: A know at[8] B send at[8] {dataB}H(F(KbPriv1, KbPub1, KaPub1), F(KbPriv2, KbPub2, KaPub2), ioCapB, bdAddressB, KbPub2, KaPub2);

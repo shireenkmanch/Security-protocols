@@ -1,0 +1,88 @@
+//----------------------------------------------------------------------------------------------------------------
+//
+//   Software Defined Mobile Networks (SDMN) 
+//   ******************************************
+//  “ Secure communication channel architecture 
+//    for Software Defined Mobile Networks “, 2017
+// 
+//----------------------------------------------------------------------------------------------------------------
+//   AUTHENTICATION FOR CONTROL CHANNEL - Tunnel Establishment protocol for control channel
+//----------------------------------------------------------------------------------------------------------------
+//   Author: Shireen Kudukkil Manchingal
+//   Date: 07 July 2017
+
+
+
+// PROTOCOL SPECIFICATION
+// ***********************
+// DPS : Data Plane Switch
+// SecGW : Security Gateway
+// Nseq : Unique session identifier
+// Nb : Nonce of B
+// Kab : Shared Key
+// KaPub, KbPub : Public keys of A and B
+// KaPriv, KbPriv : Private keys of A and B
+
+
+// 1. DPS -> SecGW : H(KaPub), H(KbPub), Nseq
+// 2. SecGW -> DPS : H(KbPub), H(KaPub), {Nb, {Kab}KaPub, KbPub, Nseq, data_echo_Request}KbPriv
+// 3. DPS -> SecGW : H(KaPub), H(KbPub), {F(Nb), {Kab}KbPub, KaPub, Nseq, data_echo_Response}KaPriv
+
+
+//-----------------------------------------------------------------------------------------------------------------
+
+
+// 1.Initial Assumptions
+// **********************
+// a.Express DPS's possessions/knowledge at time t0
+A1: DPS possess at[0] KaPub;
+A2: DPS possess at[0] KaPriv;
+A3: DPS possess at[0] KbPub;
+A4: DPS possess at[0] Nseq;
+A5: DPS know at[0] NOT(Zero possess at[0] Nseq);
+A6: DPS know at[0] SecGW possess at[0] KbPriv;
+A7: DPS know at[0] KMaterial(Kab);
+
+// b.Express SecGW's possessions/knowledge at time t0
+A8: SecGW possess at[0] KbPub;
+A9: SecGW possess at[0] KbPriv;
+A10: SecGW possess at[0] KaPub;
+A11: SecGW possess at[0] Nb;
+A12: SecGW know at[0] NOT(Zero possess at[0] Nb);
+A13: SecGW know at[0] DPS possess at[0] KaPriv;
+A14: SecGW know at[0] KMaterial(Kab);
+
+
+
+
+// 2.Protocol Steps
+// *****************
+S1: SecGW receivefrom DPS at[1] H(KaPub), H(KbPub), Nseq;
+S2: DPS receivefrom SecGW at[2] H(KbPub), H(KaPub), {Nb, {Kab}KaPub, KbPub, Nseq, data_echo_Request}KbPriv;
+S3: SecGW receivefrom DPS at[3] H(KaPub), H(KbPub), {F(Nb), {Kab}KbPub, KaPub, Nseq, data_echo_Response}KaPriv;
+
+
+
+
+// 3.Protocol Goals
+// *****************
+G1: SecGW possess at[1] H(KaPub);
+G2: SecGW possess at[1] H(KbPub);
+G3: SecGW possess at[1] Nseq;
+G4: DPS possess at[2] H(KbPub);
+G5: DPS possess at[2] H(KaPub);
+G6: DPS possess at[2] Kab;
+G7: DPS possess at[2] data_echo_Request;
+G8: DPS possess at[2] {Nb, {Kab}KaPub, KbPub, Nseq, data_echo_Request}KbPriv;
+G9: DPS know at[2] SecGW send at[2] {Nb, {Kab}KaPub, KbPub, Nseq, data_echo_Request}KbPriv; 
+G10: DPS know at[2] (not(Zero possess at[0] H(KbPub), H(KaPub), {Nb, {Kab}KaPub, KbPub, Nseq, data_echo_Request}KbPriv));
+G11: DPS know at[2] (not(Zero send at[0] H(KbPub), H(KaPub), {Nb, {Kab}KaPub, KbPub, Nseq, data_echo_Request}KbPriv));
+G12: SecGW possess at[3] F(Nb);
+G13: SecGW possess at[3] Kab;
+G14: SecGW possess at[3] data_echo_Response;
+G15: SecGW possess at[3] {F(Nb), {Kab}KbPub, KaPub, Nseq, data_echo_Response}KaPriv;
+G16: SecGW know at[3] DPS send at[3] {F(Nb), {Kab}KbPub, KaPub, Nseq, data_echo_Response}KaPriv;
+G17: SecGW know at[3] (not(Zero possess at[0] F(Nb)));
+G18: SecGW know at[3] (not(Zero possess at[0] H(KaPub), H(KbPub), {F(Nb), {Kab}KbPub, KaPub, Nseq, data_echo_Response}KaPriv));
+G19: SecGW know at[3] (not(Zero send at[0] H(KaPub), H(KbPub), {F(Nb), {Kab}KbPub, KaPub, Nseq, data_echo_Response}KaPriv));
+

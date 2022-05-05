@@ -1,0 +1,146 @@
+//----------------------------------------------------------------------------------------------------------------
+//
+//   Privacy-preserving mobile wallet
+//   **********************************
+//  “ A secure and privacy-preserving mobile wallet with 
+//    outsourced verification in cloud computing “, 2017
+// 
+//----------------------------------------------------------------------------------------------------------------
+//   Author: Shireen Kudukkil Manchingal
+//   dAte: 19 July 2017
+
+
+
+// PROTOCOL SPECIFICATION
+// ***********************
+// Alice : Customer
+// Bob : Merchant
+// tId : Transaction identity
+// idA : Real identity of Alice
+// idB : Real identity of Bob
+// psuidA : Psuedo-identity of Alice
+// psuidB : Psuedo-identity of Bob
+// amountT : Amount to be paid 
+// amountR : Amount received
+// KaPub, KaPriv : Public and private keys of Alice
+// KbPub, KbPriv : Public and private keys of Bob
+// dA, dB : Partial private keys of Alice and Bob respectively
+// TTP : Trusted third party
+// KttpPub, KttpPriv : Public and private keys of TTP
+
+
+// 1. Alice -> TTP : {idA}KttpPub
+// 2. TTP -> Alice : {psuidA, dA}KttpPriv
+// 3. Bob -> TTP : {idB}KttpPub
+// 4. TTP -> Bob : {psuidB, dB}KttpPriv
+// 5. Bob -> Alice :  payment = (tId, amountT, psuidB) 
+// 	Alice :  Signature = {dA, H(payment, psuidA, KaPub)}KaPriv
+// 6. Alice -> Bob : (Signature, payment, KaPub)
+// 	Bob : Signature = {dB, H(tId, amountR, psuidB, KaPub)}KbPriv
+// 7. Bob -> Alice : (tId, amountR, Signature)
+
+
+
+//-----------------------------------------------------------------------------------------------------------------
+
+
+// 1.Initial Assumptions
+// **********************
+// a.Express A's possessions/knowledge at time t0
+A1: A possess at[0] KaPub;
+A2: A possess at[0] KaPriv;
+A3: A possess at[0] idA;
+A4: A possess at[0] KbPub;
+A5: A possess at[0] KttpPub;
+A6: A know at[0] TTP possess at[0] KttpPriv;
+A7: A know at[0] B possess at[0] KbPriv;
+A8: A know at[0] NOT(Zero possess at[0] KaPriv);
+A9: A know at[0] NOT(Zero possess at[0] idA);
+A10: A know at[0] NOT(Zero possess at[0] psuidA);
+A11: A know at[0] NOT(Zero possess at[0] dA);
+A12: A know at[0] NOT(Zero possess at[0] dB);
+A13: A know at[0] NOT(Zero possess at[0] tId);
+
+
+
+// b.Express B's possessions/knowledge at time t0
+A14: B possess at[0] KbPub;
+A15: B possess at[0] KbPriv;
+A16: B possess at[0] idB;
+A17: B possess at[0] amountT;
+A18: B possess at[0] amountR;
+A19: B possess at[0] tId;
+A20: B possess at[0] KaPub;
+A21: B possess at[0] KttpPub;
+A22: B know at[0] TTP possess at[0] KttpPriv;
+A23: B know at[0] A possess at[0] KaPriv;
+A24: B know at[0] NOT(Zero possess at[0] KbPriv);
+A25: B know at[0] NOT(Zero possess at[0] idB);
+A26: B know at[0] NOT(Zero possess at[0] tId);
+A27: B know at[0] NOT(Zero possess at[0] psuidB);
+
+
+
+// c.Express TTP's possessions/knowledge at time t0
+A28: TTP possess at[0] KttpPub;
+A29: TTP possess at[0] KttpPriv;
+A30: TTP possess at[0] psuidA;
+A31: TTP possess at[0] psuidB;
+A32: TTP possess at[0] dA;
+A33: TTP possess at[0] dB;
+A34: TTP possess at[0] KaPub;
+A35: TTP possess at[0] KbPub;
+A36: TTP know at[0] A possess at[0] KaPriv;
+A37: TTP know at[0] B possess at[0] KbPriv;
+A38: TTP know at[0] NOT(Zero possess at[0] KttpPriv);
+A39: TTP know at[0] NOT(Zero possess at[0] psuidA);
+A40: TTP know at[0] NOT(Zero possess at[0] psuidB);
+A41: TTP know at[0] NOT(Zero possess at[0] dA);
+A42: TTP know at[0] NOT(Zero possess at[0] dB);
+A43: TTP know at[0] NOT(Zero possess at[0] idA);
+A44: TTP know at[0] NOT(Zero possess at[0] idB);
+
+
+
+
+// 2.Protocol Steps
+// *****************
+S1: TTP receivefrom A at[1] {{idA}KttpPub}KaPriv;
+S2: A receivefrom TTP at[2] {{psuidA, dA}KaPub}KttpPriv;
+S3: TTP receivefrom B at[3] {{idB}KttpPub}KbPriv;
+S4: B receivefrom TTP at[4] {{psuidB, dB}KbPub}KttpPriv;
+S5: A receivefrom B at[5] {{tId, amountT, psuidB}KaPub}KbPriv;
+S6: B receivefrom A at[6] {{dA, H(tId, amountT, psuidB, psuidA, KaPub)}KaPriv, tId, amountT, psuidB, KaPub}KbPub;
+S7: A receivefrom B at[7] {{tId, amountR, {dB, H(tId, amountR, psuidB, KaPub)}KbPriv}KaPub}KbPriv;
+
+
+
+
+// 3.Protocol Goals
+// *****************
+G1: TTP possess at[1] idA;
+G2: TTP know at[1] A send at[1] {{idA}KttpPub}KaPriv;
+G3: TTP know at[1] NOT(Zero possess at[0] {{idA}KttpPub}KaPriv);
+G4: A possess at[2] psuidA;
+G5: A possess at[2] dA;
+G6: A know at[2] TTP send at[2] {{psuidA, dA}KaPub}KttpPriv;
+G7: A know at[2] NOT(Zero possess at[0] {{psuidA, dA}KaPub}KttpPriv);
+G8: TTP possess at[3] idB;
+G9: TTP know at[3] B send at[3] {{idB}KttpPub}KbPriv;
+G10: TTP know at[3] NOT(Zero possess at[0] {{idB}KttpPub}KbPriv);
+G11: B possess at[4] psuidB;
+G12: B possess at[4] dB;
+G13: B know at[4] TTP send at[4] {{psuidB, dB}KbPub}KttpPriv; 
+G14: B know at[4] NOT(Zero possess at[0] {{psuidB, dB}KbPub}KttpPriv); 
+G15: A possess at[5] tId;
+G16: A possess at[5] amountT;
+G17: A possess at[5] psuidB;
+G18: A know at[5] B send at[5] {{tId, amountT, psuidB}KaPub}KbPriv;
+G19: A know at[5] NOT(Zero possess at[0] {{tId, amountT, psuidB}KaPub}KbPriv);
+G20: B possess at[6] {dA, H(tId, amountT, psuidB, psuidA, KaPub)}KaPriv;
+G21: B know at[6] A send at[6] {dA, H(tId, amountT, psuidB, psuidA, KaPub)}KaPriv;
+G22: B know at[6] NOT(Zero possess at[0] {dA, H(tId, amountT, psuidB, psuidA, KaPub)}KaPriv);
+G23: A possess at[7] {dB, H(tId, amountR, psuidB, KaPub)}KbPriv;
+G24: A possess at[7] amountR;
+G25: A know at[7] B send at[7] {{tId, amountR, {dB, H(tId, amountR, psuidB, KaPub)}KbPriv}KaPub}KbPriv;
+G26: A know at[7] NOT(Zero possess at[0] {{tId, amountR, {dB, H(tId, amountR, psuidB, KaPub)}KbPriv}KaPub}KbPriv);

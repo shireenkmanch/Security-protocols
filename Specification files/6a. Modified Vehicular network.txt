@@ -1,0 +1,100 @@
+//----------------------------------------------------------------------------------------------------------------
+//
+//   Communications in vehicular networks - Modified
+//   ************************************************
+//  “ Light weight security protocol for communications in 
+//    vehicular networks “, 2016
+// 
+//----------------------------------------------------------------------------------------------------------------
+//   Author: Shireen Kudukkil Manchingal
+//   Date: 31 August 2017
+
+
+
+// PROTOCOL SPECIFICATION
+// ***********************
+// OBU : On Board Units/Vehicle
+// RSU : Road-side Units
+// Kelp : Electronic license plate/Unique id of Vehicle
+// KrsuPub : Public key of RSU
+// KrsuPriv : Private key of RSU
+// KobuPub : Public key of OBU
+// KobuPriv : Private key of OBU
+// Nobu : Nonce of OBU
+// Nrsu : Nonce of RSU
+// polynomial : Coeffs of polynomial
+// id : id selected by RSU from pool of ids for a particular OBU
+
+
+// 1. OBU -> RSU : {{Kelp, Nobu}KrsuPub}KobuPriv
+//	RSU : {{{Kelp, Nobu}KrsuPub}KobuPriv}KobuPub = {{Kelp, Nobu}KrsuPub}KrsuPriv = Kelp, Nobu
+// 2. RSU -> OBU : {Coeffs of polynomial, id, Nrsu}Kelp
+//	OBU : {{Coeffs of polynomial, id, Nrsu}Kelp}Kelp = (Coeffs of polynomial, id, Nrsu)
+//	OBU : Shared key = F(Coeffs of polynomial, id)
+
+
+
+
+//-----------------------------------------------------------------------------------------------------------------
+
+
+// 1.Initial Assumptions
+// **********************
+// a.Express OBU's possessions/knowledge at time t0
+A1: OBU possess at[0] Kelp;
+A2: OBU possess at[0] KobuPub;
+A3: OBU possess at[0] KobuPriv;
+A4: OBU possess at[0] KrsuPub;
+A5: OBU possess at[0] Nobu;
+A6: OBU know at[0] NOT(Zero possess at[0] Nobu);
+A7: OBU know at[0] NOT(Zero possess at[0] Kelp);
+A8: OBU know at[0] NOT(Zero possess at[0] KobuPriv);
+A9: OBU know at[0] NOT(Zero possess at[0] polynomial);
+A10: OBU know at[0] NOT(Zero possess at[0] id);
+A11: OBU know at[0] RSU possess at[0] KobuPub;
+A12: OBU know at[0] RSU possess at[0] polynomial;
+A13: OBU know at[0] RSU possess at[0] id;
+A14: OBU know at[0] RSU possess at[0] Nrsu;
+
+
+// b.Express RSU's possessions/knowledge at time t0
+A15: RSU possess at[0] KrsuPub;
+A16: RSU possess at[0] KrsuPriv;
+A17: RSU possess at[0] polynomial;
+A18: RSU possess at[0] id;
+A19: RSU possess at[0] KobuPub;
+A20: RSU possess at[0] Nrsu;
+A21: RSU know at[0] NOT(Zero possess at[0] Nrsu);
+A22: RSU know at[0] NOT(Zero possess at[0] Nobu);
+A23: RSU know at[0] NOT(Zero possess at[0] KrsuPriv);
+A24: RSU know at[0] OBU possess at[0] KrsuPub;
+A25: RSU know at[0] OBU possess at[0] Kelp;
+A26: RSU know at[0] OBU possess at[0] KobuPriv;
+A27: OBU know at[0] ((OBU receivefrom RSU at[2] {polynomial, id, Nrsu}Kelp AND RSU possess at[0] Nrsu) IMPLY (RSU possess at[2] Kelp));
+
+
+
+// 2.Protocol Steps
+// *****************
+S1: RSU receivefrom OBU at[1] {{Kelp, Nobu}KrsuPub}KobuPriv;
+S2: OBU receivefrom RSU at[2] {polynomial, id, Nrsu}Kelp; 
+
+
+
+
+// 3.Protocol Goals
+// *****************
+G1: RSU possess at[1] Kelp;
+G2: RSU possess at[1] Nobu;
+G3: RSU know at[1] OBU possess at[1] Kelp;
+G4: RSU know at[1] OBU send at[1] {{Kelp, Nobu}KrsuPub}KobuPriv;
+G5: RSU know at[1] NOT(Zero possess at[0] {{Kelp, Nobu}KrsuPub}KobuPriv);
+G6: OBU possess at[2] polynomial;
+G7: OBU possess at[2] id;
+G8: OBU possess at[2] Nrsu;
+G9: OBU know at[2] RSU possess at[2] polynomial;
+G10: OBU know at[2] RSU possess at[2] id;
+G11: OBU know at[2] RSU send at[2] {polynomial, id, Nrsu}Kelp;
+G12: OBU know at[2] NOT(Zero possess at[0] {polynomial, id, Nrsu}Kelp);
+
+

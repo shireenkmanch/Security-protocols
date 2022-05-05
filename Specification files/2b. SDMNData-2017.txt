@@ -1,0 +1,85 @@
+//----------------------------------------------------------------------------------------------------------------
+//
+//   Software Defined Mobile Networks (SDMN) 
+//   ******************************************
+//  “ Secure communication channel architecture 
+//    for Software Defined Mobile Networks “, 2017
+// 
+//----------------------------------------------------------------------------------------------------------------
+//   AUTHENTICATION FOR DATA CHANNEL - Tunnel Establishment protocol for data channel
+//----------------------------------------------------------------------------------------------------------------
+//   Author: Shireen Kudukkil Manchingal
+//   Date: 07 July 2017
+
+
+
+// PROTOCOL SPECIFICATION
+// ***********************
+// DPS1 : Data Plane Switch 1
+// DPS2 : Data Plane Switch 2
+// Nseq : Unique session identifier
+// Nb : Nonce of B
+// KaPub, KbPub : Public keys of A and B
+// KaPriv, KbPriv : Private keys of A and B
+
+
+// 1. DPS1 -> DPS2 : H(KaPub), H(KbPub), Nseq
+// 2. DPS2 -> DPS1 : H(KbPub), H(KaPub), {Nb, KbPub, Nseq, data_echo_Request}KbPriv
+// 3. DPS1 -> DPS2 : H(KaPub), H(KbPub), {F(Nb), KaPub, Nseq, data_echo_Response}KaPriv
+
+
+//-----------------------------------------------------------------------------------------------------------------
+
+
+// 1.Initial Assumptions
+// **********************
+// a.Express DPS1's possessions/knowledge at time t0
+A1: DPS1 possess at[0] KaPub;
+A2: DPS1 possess at[0] KaPriv;
+A3: DPS1 possess at[0] KbPub;
+A4: DPS1 possess at[0] Nseq;
+A5: DPS1 know at[0] NOT(Zero possess at[0] Nseq);
+A6: DPS1 know at[0] DPS2 possess at[0] KbPriv;
+
+// b.Express DPS2's possessions/knowledge at time t0
+A7: DPS2 possess at[0] KbPub;
+A8: DPS2 possess at[0] KbPriv;
+A9: DPS2 possess at[0] KaPub;
+A10: DPS2 possess at[0] Nb;
+A11: DPS2 know at[0] NOT(Zero possess at[0] Nb);
+A12: DPS2 know at[0] DPS1 possess at[0] KaPriv;
+
+
+
+
+// 2.Protocol Steps
+// *****************
+S1: DPS2 receivefrom DPS1 at[1] H(KaPub), H(KbPub), Nseq;
+S2: DPS1 receivefrom DPS2 at[2] H(KbPub), H(KaPub), {Nb, DPS1, KbPub, Nseq, data_echo_Request}KbPriv;
+S3: DPS2 receivefrom DPS1 at[3] H(KaPub), H(KbPub), {F(Nb), DPS2, KaPub, Nseq, data_echo_Response}KaPriv;
+
+
+
+
+// 3.Protocol Goals
+// *****************
+G1: DPS2 possess at[1] H(KaPub);
+G2: DPS2 possess at[1] H(KbPub);
+G3: DPS2 possess at[1] Nseq;
+G4: DPS1 possess at[2] H(KbPub);
+G5: DPS1 possess at[2] H(KaPub);
+G6: DPS1 possess at[2] Nb;
+G7: DPS1 possess at[2] Nseq;
+G8: DPS1 possess at[2] data_echo_Request;
+G9: DPS1 possess at[2] {Nb, DPS1, KbPub, Nseq, data_echo_Request}KbPriv;
+G10: DPS1 know at[2] DPS2 send at[2] {Nb, DPS1, KbPub, Nseq, data_echo_Request}KbPriv;
+G11: DPS1 know at[2] (not(Zero possess at[0] H(KbPub), H(KaPub), {Nb, DPS1, KbPub, Nseq, data_echo_Request}KbPriv));
+G12: DPS1 know at[2] (not(Zero send at[0] H(KbPub), H(KaPub), {Nb, DPS1, KbPub, Nseq, data_echo_Request}KbPriv));
+G13: DPS2 possess at[3] F(Nb);
+G14: DPS2 possess at[3] data_echo_Response;
+G15: DPS2 possess at[3] {F(Nb), DPS2, KaPub, Nseq, data_echo_Response}KaPriv;
+G16: DPS2 know at[3] DPS1 send at[3] {F(Nb), DPS2, KaPub, Nseq, data_echo_Response}KaPriv;
+G17: DPS2 know at[3] (not(Zero possess at[0] F(Nb)));
+G18: DPS2 know at[3] (not(Zero possess at[0] H(KaPub), H(KbPub), {F(Nb), DPS2, KaPub, Nseq, data_echo_Response}KaPriv));
+G19: DPS2 know at[3] (not(Zero send at[0] H(KaPub), H(KbPub), {F(Nb), DPS2, KaPub, Nseq, data_echo_Response}KaPriv));
+

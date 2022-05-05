@@ -1,0 +1,59 @@
+// Andrew Secure RPC Formal Specification
+// ****************************************
+// Author: Shireen Kudukkil Manchingal
+// Date: 08 Feb 2017
+
+
+// Protocol specification
+// ------------------------
+// A, B :  principal
+// Kab, Kab1 :  symkey
+// Na, Nb, Nb1 :  nonce
+// succ :  nonce -> nonce
+
+// 1.  	A -> B	:  A, {Na}Kab
+// 2.  	B -> A	:  {succNa, Nb}Kab
+// 3.  	A -> B	:  {succNb}Kab
+// 4.  	B -> A	:  {Kab1, Nb1}Kab
+
+
+// 1.Initial Assupmtions
+// -----------------------
+// a.Express A's possessions/knowledge at time t0
+A1: A possess at[0] Kab;
+A2: A possess at[0] Na;
+A3: A know at[0] B possess at[0] Kab;
+A4: A know at[0] NOT(Zero possess at[0] Na);
+
+// b.Express B's possessions/knowledge at time t0
+A5: B possess at[0] Kab;
+A6: B possess at[0] Nb;
+A7: B possess at[0] Nb1;
+A8: B know at[0] A possess at[0] Kab;
+A9: B know at[0] NOT(Zero possess at[0] Nb);
+A10: B know at[0] NOT(Zero possess at[0] Nb1);
+A11: B possess at[3] Kab1;
+
+
+// ***************************************************************
+// Protocol Steps
+// ---------------
+S1: B receivefrom A at[1] A,{Na}Kab;
+S2: A receivefrom B at[2] {(F(Na), Nb)}Kab;
+S3: B receivefrom A at[3] {F(Nb)}Kab;
+S4: A receivefrom B at[4] {(Kab1, Nb1)}Kab;
+
+
+// ***************************************************************
+// Protocol Goals
+// ---------------
+// a. Mutual Authentication of A and B
+G1: A know at[2] B send at[2] {(F(Na),Nb)}Kab;
+G2: B know at[3] A send at[3] {F(Nb)}Kab;
+
+// b. Sharing of new key Kab1 between A and B
+G3: A possess at[4] Kab1;
+G4: B possess at[4] Kab1;
+G5: A know at[4] B possess at[4] Kab1;
+G6: B know at[4] A possess at[4] Kab1;
+G7: A know at[4] NOT( Zero send at[0] {(Kab1, Nb1)}Kab);

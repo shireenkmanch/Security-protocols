@@ -1,0 +1,38 @@
+// 1.Initial Assupmtions
+// -----------------------
+// a.Express A's possessions/knowledge at time t0
+A1: A possess at[0] Kas;
+A2: A possess at[0] Na;
+A3: A know at[0] S possess at[0] Kas;
+A4: A know at[0] NOT(Zero possess at[0] Na);
+
+// b.Express B's possessions/knowledge at time t0
+A5: B possess at[0] Kbs;
+A6: B possess at[0] Nb;
+A7: B know at[0] S possess at[0] Kbs;
+A8: B know at[0] NOT(Zero possess at[0] Nb);
+
+// c.Express S's possessions/knowledge at time t0
+A9: S possess at[0] Kab;
+A10: S know at[0] NOT(Zero possess at[0] Kab);
+
+
+// ***************************************************************
+// Protocol Steps
+// ---------------
+S1: S receivefrom A at[1] A,B,Na;
+S2: B receivefrom S at[2] {A,B,Na,Kab}Kas,{A,B,Na,Kab}Kbs;
+S3: A receivefrom B at[3] {A,B,Na,Kab}Kas,{Na}Kab,Nb;
+S4: B receivefrom A at[4] {Nb}Kab;
+
+
+// ***************************************************************
+// Protocol Goals
+// ---------------
+G1: B know at[2] S send at[2] {A,B,Na,Kab}Kbs;
+G2: A know at[3] B send at[3] {A,B,Na,Kab}Kas;
+G3: B possess at[2] Kab;
+G4: A possess at[3] Kab;
+G5: B know at[4] A possess at[3] Kab;
+G6: A know at[3] A possess at[2] Kab;
+G7: A know at[4] NOT( Zero send at[0] {A,B,Na,Kab}Kas,{A,B,Na,Kab}Kbs);
